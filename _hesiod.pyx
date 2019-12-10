@@ -59,14 +59,14 @@ def resolve(hes_name, hes_type):
     cdef int i
     cdef object py_result
     py_result = list()
-    cdef char ** c_result
+    cdef int err = 0
+    cdef char ** c_result = NULL
     
     name_str, type_str = map(str, (hes_name, hes_type))
     
-    __lookup_lock.acquire()
-    c_result = hesiod_resolve(__context, name_str, type_str)
-    err = errno
-    __lookup_lock.release()
+    with __lookup_lock:
+        c_result = hesiod_resolve(__context, name_str, type_str)
+        err = errno
     
     if c_result is NULL:
         raise IOError(err, strerror(err))
