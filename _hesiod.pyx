@@ -41,10 +41,17 @@ def bind(hes_name, hes_type):
     """
     cdef object py_result
     cdef char * c_result
-    
-    name_str, type_str = map(str, (hes_name, hes_type))
-    
-    c_result = hesiod_to_bind(__context, name_str, type_str)
+
+    # N.B. libhesiod actually uses the locale, but
+    # locale.getpreferredencoding is not threadsafe so we have to
+    # assume utf-8.
+
+    if isinstance(hes_name, unicode):
+        hes_name = hes_name.encode('utf-8')
+    if isinstance(hes_type, unicode):
+        hes_type = hes_type.encode('utf-8')
+
+    c_result = hesiod_to_bind(__context, hes_name, hes_type)
     if c_result is NULL:
         raise IOError(errno, strerror(errno))
     py_result = c_result
@@ -61,11 +68,14 @@ def resolve(hes_name, hes_type):
     py_result = list()
     cdef int err = 0
     cdef char ** c_result = NULL
-    
-    name_str, type_str = map(str, (hes_name, hes_type))
+
+    if isinstance(hes_name, unicode):
+        hes_name = hes_name.encode('utf-8')
+    if isinstance(hes_type, unicode):
+        hes_type = hes_type.encode('utf-8')
     
     with __lookup_lock:
-        c_result = hesiod_resolve(__context, name_str, type_str)
+        c_result = hesiod_resolve(__context, hes_name, hes_type)
         err = errno
     
     if c_result is NULL:
@@ -74,7 +84,7 @@ def resolve(hes_name, hes_type):
     while True:
         if c_result[i] is NULL:
             break
-        py_result.append(c_result[i])
+        py_result.append(c_result[i].decode('utf-8', 'replace'))
         i = i + 1
     
     hesiod_free_list(__context, c_result)

@@ -110,7 +110,7 @@ class PasswdLookup(Lookup):
 
 class UidLookup(PasswdLookup):
     def __init__(self, uid):
-        Lookup.__init__(self, uid, 'uid')
+        Lookup.__init__(self, b'%d' % (uid,), 'uid')
 
 class GroupLookup(Lookup):
     def __init__(self, group):
@@ -130,7 +130,7 @@ class GroupLookup(Lookup):
 
 class GidLookup(GroupLookup):
     def __init__(self, gid):
-        Lookup.__init__(self, gid, 'gid')
+        Lookup.__init__(self, b'%d' % (gid,), 'gid')
 
 __all__ = ['bind', 'resolve',
            'Lookup', 'FilsysLookup', 'PasswdLookup', 'UidLookup',
