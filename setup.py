@@ -6,7 +6,7 @@ from Cython.Build import cythonize
 
 setup(
     name="PyHesiod",
-    version="0.2.12",
+    version="0.2.13",
     description="PyHesiod - Python bindings for the Heisod naming library",
     author="Evan Broder",
     author_email="broder@mit.edu",
